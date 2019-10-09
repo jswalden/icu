@@ -83,6 +83,73 @@ U_CAPI UListFormatter* U_EXPORT2
 ulistfmt_open(const char*  locale,
               UErrorCode*  status);
 
+#ifndef U_HIDE_DRAFT_API
+typedef enum UListFormatType {
+    /**
+     * Conjunction formatting, e.g. "Alice, Bob, Charlie, and Delta".
+     * @draft ICU 66
+     */
+    ULISTFMT_TYPE_CONJUNCTION,
+
+    /**
+     * Disjunction (or alternative, or simply one of) formatting, e.g.
+     * "Alice, Bob, Charlie, or Delta".
+     * @draft ICU 66
+     */
+    ULISTFMT_TYPE_DISJUNCTION,
+
+    /**
+     * Formatting of a list of values with units, e.g. "5 pounds, 12 ounces".
+     * @draft ICU 66
+     */
+    ULISTFMT_TYPE_UNIT
+} UListFormatType;
+
+typedef enum UListFormatWidth {
+    /**
+     * Use list formatting of typical length.
+     * @draft ICU 66
+     */
+    ULISTFMT_WIDTH_LONG,
+    /**
+     * Use list formatting that's shorter than typical length.
+     * @draft ICU 66
+     */
+    ULISTFMT_WIDTH_NARROW,
+    /**
+     * Use list formatting that's even shorter than typical length.
+     * @draft ICU 66
+     */
+    ULISTFMT_WIDTH_SHORT
+} UListFormatWidth;
+
+/**
+ * Open a new UListFormatter object appropriate for the given locale, list type,
+ * and style.
+ *
+ * @param locale
+ *            The locale whose rules should be used; may be NULL for
+ *            default locale.
+ * @param type
+ *            The type of list formatting to use.
+ * @param width
+ *            The width of formatting to use.
+ * @param status
+ *            A pointer to a standard ICU UErrorCode (input/output parameter).
+ *            Its input value must pass the U_SUCCESS() test, or else the
+ *            function returns immediately. The caller should check its output
+ *            value with U_FAILURE(), or use with function chaining (see User
+ *            Guide for details).
+ * @return
+ *            A pointer to a UListFormatter object for the specified locale,
+ *            or NULL if an error occurred.
+ * @draft ICU 66
+ */
+U_CAPI UListFormatter* U_EXPORT2
+ulistfmt_openStyled(const char*  locale, UListFormatType type,
+                    UListFormatWidth width, UErrorCode*  status);
+#endif /* U_HIDE_DRAFT_API */
+
 /**
  * Close a UListFormatter object. Once closed it may no longer be used.
  * @param listfmt

@@ -34,6 +34,51 @@ ulistfmt_open(const char*  locale,
 }
 
 
+U_CAPI UListFormatter* U_EXPORT2
+ulistfmt_openStyled(const char*  locale, UListFormatType type,
+                    UListFormatWidth width, UErrorCode* status)
+{
+    if (U_FAILURE(*status)) {
+        return NULL;
+    }
+
+    static const char typeStrings[][9] = { "standard", "or", "unit" };
+    if (type >= UPRV_LENGTHOF(typeStrings)) {
+        UPRV_UNREACHABLE;
+    }
+
+    static const char widthStrings[][7] = { "long", "short", "narrow" };
+    if (width >= UPRV_LENGTHOF(widthStrings)) {
+        UPRV_UNREACHABLE;
+    }
+
+    // Space is required to hold the longest type, "-", the longest width, and a
+    // null terminator.
+    char style[sizeof(typeStrings[0]) + sizeof(widthStrings[0])];
+
+    const char* t = typeStrings[type];
+    size_t filled = strlen(t);
+    memcpy(style, t, filled);
+
+    if (width != ULISTFMT_WIDTH_LONG) {
+        style[filled++] = '-';
+
+        const char* w = widthStrings[width];
+        size_t wlen = strlen(w);
+        memcpy(&style[filled], w, wlen);
+        filled += wlen;
+    }
+
+    style[filled] = '\0';
+
+    LocalPointer<ListFormatter> listfmt(ListFormatter::createInstance(Locale(locale), style, *status));
+    if (U_FAILURE(*status)) {
+        return NULL;
+    }
+    return (UListFormatter*)listfmt.orphan();
+}
+
+
 U_CAPI void U_EXPORT2
 ulistfmt_close(UListFormatter *listfmt)
 {
